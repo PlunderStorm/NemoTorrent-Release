@@ -1,0 +1,48 @@
+NemoTorrent - Licence for personal use
+Copyright (c) 2026 PluNdeR. All rights reserved.
+
+English
+
+1. You may install and use NemoTorrent free of charge on your own computers,
+   for personal, non-commercial purposes.
+2. You may give unmodified copies of the official installer to other people,
+   free of charge. Each recipient receives these same terms.
+3. You may not sell, rent or license NemoTorrent, include it in a paid product
+   or service, or distribute modified versions of it.
+4. You may not modify, decompile or reverse-engineer NemoTorrent, except where
+   the law expressly allows it despite this restriction.
+5. NemoTorrent includes third-party components, such as aria2, that remain
+   under their own licences. Those licences, listed in THIRD-PARTY-NOTICES.txt,
+   take precedence over these terms for those components, and nothing here
+   limits the rights they give you.
+6. You are responsible for what you download and share with NemoTorrent and for
+   complying with copyright law and the terms of your VPN and Real-Debrid
+   accounts.
+7. NemoTorrent is provided "as is", without warranty of any kind. To the extent
+   permitted by law, the author is not liable for any damage arising from its
+   use, including data loss or exposure of your IP address.
+8. These terms end automatically if you breach them. The author may change
+   them for future versions.
+
+Italiano
+
+1. Puoi installare e usare NemoTorrent gratuitamente sui tuoi computer, per
+   uso personale e non commerciale.
+2. Puoi dare ad altre persone copie non modificate dell'installer ufficiale,
+   gratuitamente. Chi le riceve e' vincolato a queste stesse condizioni.
+3. Non puoi vendere, noleggiare o concedere in licenza NemoTorrent, inserirlo
+   in un prodotto o servizio a pagamento, ne' distribuirne versioni modificate.
+4. Non puoi modificare, decompilare o decodificare NemoTorrent, salvo dove la
+   legge lo consente espressamente nonostante questo divieto.
+5. NemoTorrent contiene componenti di terze parti, come aria2, che restano
+   soggetti alle proprie licenze. Quelle licenze, elencate in
+   THIRD-PARTY-NOTICES.txt, prevalgono su queste condizioni per quei
+   componenti, e nulla qui limita i diritti che ti danno.
+6. Sei responsabile di cio' che scarichi e condividi con NemoTorrent e del
+   rispetto del diritto d'autore e delle condizioni dei tuoi account VPN e
+   Real-Debrid.
+7. NemoTorrent e' fornito "cosi' com'e'", senza garanzie di alcun tipo. Nei limiti
+   consentiti dalla legge, l'autore non risponde di danni derivanti dal suo
+   uso, compresi perdita di dati o esposizione del tuo indirizzo IP.
+8. Queste condizioni cessano automaticamente se le violi. L'autore puo'
+   modificarle per le versioni future.
