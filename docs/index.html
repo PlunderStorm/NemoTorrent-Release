@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NemoTorrent: download as no one</title>
+<meta name="description" content="NemoTorrent is a free Windows torrent client that only downloads through your WireGuard or NordVPN tunnel. If the VPN drops, everything stops: your real IP never leaves.">
+<meta name="theme-color" content="#14171A">
+<meta property="og:title" content="NemoTorrent: download as no one">
+<meta property="og:description" content="A Windows torrent client that never downloads outside your VPN. Two-level kill-switch, no leaks, no telemetry.">
+<meta property="og:image" content="img/home.webp">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #111416;
+    --bg-2: #171B1E;
+    --panel: #1C2125;
+    --line: #2A3035;
+    --text: #E7EAED;
+    --muted: #8C959C;
+    --accent: #FF6B2C;
+    --accent-ink: #1A0D06;
+    --ok: #3FCF8E;
+    --danger: #F0505A;
+    --radius: 14px;
+    color-scheme: dark;
+    --max: 1120px;
+    --font: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* Top bar */
+  .top { position: sticky; top: 0; z-index: 10; background: rgba(17,20,22,.86); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; font-size: 18px; }
+  .brand:hover { text-decoration: none; }
+  .brand img { width: 30px; height: 30px; }
+  .top nav { display: flex; gap: 22px; align-items: center; }
+  .top nav a { color: var(--muted); font-size: 15px; }
+  .top nav a:hover { color: var(--text); text-decoration: none; }
+  .top nav .btn { color: var(--accent-ink); }
+
+  .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 700; border-radius: 10px; padding: 14px 22px; font-size: 17px; border: 0; cursor: pointer; }
+  .btn:hover { text-decoration: none; filter: brightness(1.08); }
+  .btn.small { padding: 8px 14px; font-size: 14px; border-radius: 8px; }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 8px; color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 13px 20px; font-weight: 600; }
+  .btn-ghost:hover { text-decoration: none; border-color: var(--muted); }
+
+  /* Hero */
+  .hero { padding: 72px 0 40px; text-align: center; }
+  .hero .logo { width: 104px; height: 104px; margin: 0 auto 22px; }
+  .hero h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1.05; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .hero .tag { font-size: clamp(20px, 3vw, 26px); color: var(--accent); font-weight: 600; margin: 0 0 18px; }
+  .hero .lead { max-width: 660px; margin: 0 auto 32px; color: var(--muted); font-size: 19px; }
+  .cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .meta { margin-top: 14px; color: var(--muted); font-size: 14px; }
+  .meta span + span::before { content: "·"; margin: 0 8px; }
+
+  .shot { margin: 48px auto 0; border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.45); background: var(--panel); }
+  .shot img { width: 100%; height: auto; }
+
+  /* Sections */
+  section { padding: 72px 0; }
+  section.alt { background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  h2 { font-size: clamp(28px, 4vw, 38px); line-height: 1.15; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); max-width: 640px; margin: 0 0 40px; font-size: 18px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .card h3 { margin: 14px 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15.5px; }
+  .ico { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,107,44,.12); color: var(--accent); }
+  .ico svg { width: 22px; height: 22px; }
+  .ico.red { background: rgba(240,80,90,.12); color: var(--danger); }
+
+  .split { display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: center; }
+  .split.rev { grid-template-columns: 7fr 5fr; }
+  .split .shot { margin: 0; }
+  .list { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 14px; }
+  .list li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; color: var(--muted); }
+  .list li b { color: var(--text); font-weight: 600; }
+  .list svg { width: 20px; height: 20px; margin-top: 3px; color: var(--accent); }
+  .list.red svg { color: var(--danger); }
+  .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .kicker.red { color: var(--danger); }
+
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .gallery figure { margin: 0; }
+  .gallery figcaption { color: var(--muted); font-size: 14.5px; margin-top: 10px; }
+  .gallery .shot { margin: 0; box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+
+  .stack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .chip { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; }
+  .chip b { display: block; font-size: 17px; }
+  .chip span { color: var(--muted); font-size: 15px; }
+  .chip code { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+
+  .steps { counter-reset: s; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .steps .card { position: relative; padding-top: 58px; }
+  .steps .card::before { counter-increment: s; content: counter(s); position: absolute; top: 20px; left: 24px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: 15px; }
+  .note { margin-top: 24px; padding: 16px 20px; border-left: 3px solid var(--accent); background: var(--panel); border-radius: 0 10px 10px 0; color: var(--muted); font-size: 15.5px; }
+  .note b { color: var(--text); }
+
+  .final { text-align: center; }
+  .final .sub { margin: 0 auto 32px; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  footer a { color: var(--muted); text-decoration: underline; }
+  footer a:hover { color: var(--text); }
+  footer p { margin: 0 0 6px; }
+
+  @media (max-width: 900px) {
+    .grid, .stack, .steps { grid-template-columns: 1fr 1fr; }
+    .split, .split.rev { grid-template-columns: 1fr; gap: 32px; }
+    .split.rev .shot { order: 2; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .wrap { padding: 0 16px; }
+    .top nav a:not(.btn) { display: none; }
+    .hero { padding: 48px 0 24px; }
+    section { padding: 56px 0; }
+    .grid, .stack, .steps, .gallery { grid-template-columns: 1fr; }
+    .btn, .btn-ghost { width: 100%; justify-content: center; }
+    .top nav .btn { width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="logo.svg" alt="" width="30" height="30">NemoTorrent</a>
+    <nav aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#killswitch">Kill-switch</a>
+      <a href="#built-with">Built with</a>
+      <a href="#install">Install</a>
+      <a class="btn small js-download" href="https://github.com/PlunderStorm/NemoTorrent-Release/releases/latest">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <img class="logo" src="logo.svg" alt="NemoTorrent logo: an orange porthole with a white download arrow" width="104" height="104">
+      <h1>NemoTorrent</h1>
+      <p class="tag">Download as no one.</p>
+      <p class="lead">A Windows client for torrents, magnet links and direct downloads that only works through your VPN. If the tunnel drops, everything stops, and nothing ever leaves from your real IP address.</p>
+      <div class="cta">
+        <a class="btn js-download" href="https://github.com/PlunderStorm/NemoTorrent-Release/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>
+          <span class="js-download-label">Download for Windows</span>
+        </a>
+        <a class="btn-ghost" href="https://github.com/PlunderStorm/NemoTorrent-Release/releases">All releases</a>
+      </div>
+      <p class="meta"><span class="js-version">Latest version</span><span>Windows 10 and 11, 64-bit</span><span>Free for personal use</span></p>
+      <div class="shot"><img src="img/home.webp" width="2160" height="1290" alt="NemoTorrent main window: the VPN capsule at the top says Protected, with a list of Linux ISO downloads, speed profiles in the sidebar and a speed graph in the details panel."></div>
+    </div>
+  </section>
+
+  <section id="features" class="alt">
+    <div class="wrap">
+      <h2>Private by design, not by setting</h2>
+      <p class="sub">NemoTorrent does not have a "use VPN" switch you can forget to turn on. The VPN is the only way out.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+          <h3>Always behind your VPN</h3>
+          <p>Every download is bound to the WireGuard tunnel address. No tunnel, no traffic: it never falls back to your normal connection.</p>
+        </div>
+        <div class="card">
+          <div class="ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg></div>
+          <h3>Two-level kill-switch</h3>
+          <p>The app stops downloads the moment the tunnel drops, and the Windows firewall blocks download traffic outside the tunnel, even if the app crashes.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div>
+          <h3>No DNS or IP leaks</h3>
+          <p>DNS lookups travel inside the tunnel too, never to your internet provider, and IPv6 stays off for downloads. A built-in privacy check shows the exit IP the world actually sees.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div>
+          <h3>WireGuard and NordVPN</h3>
+          <p>Import any WireGuard <code>.conf</code> file, or add NordVPN (NordLynx) servers with your access token, including P2P servers.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a8 8 0 0 1 16 0"/><path d="M12 14l4-5"/><path d="M4 18h16"/></svg></div>
+          <h3>Speed profiles</h3>
+          <p>Turbo, Medium, Slow and Night, one click or Alt+1 to 4 away. Schedule them by hour, or slow down on their own while you game or watch a film.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></div>
+          <h3>Torrents, magnets and links</h3>
+          <p>Torrent files, magnet links and HTTP, HTTPS and FTP downloads in one list. Optional Real-Debrid support, still inside the tunnel.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 21 12a10.6 10.6 0 0 1-2.6 3.5M6.3 6.3A10.6 10.6 0 0 0 3 12a10 10 0 0 0 13.7 5.7"/></svg></div>
+          <h3>No telemetry</h3>
+          <p>No analytics, no tracking, no NemoTorrent account. The app only connects where your downloads, your VPN and the features you turn on need it to.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+          <h3>Signed updates, through the tunnel</h3>
+          <p>Updates are checked only while the VPN is on, and installed only if the signature matches the key built into the app.</p>
+        </div>
+        <div class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></div>
+          <h3>Made to be read at a glance</h3>
+          <p>Dark, light and high-contrast themes, adjustable text size, every status with an icon and a word. English and Italian.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="killswitch">
+    <div class="wrap split">
+      <div>
+        <div class="kicker red">Kill-switch</div>
+        <h2>When the VPN drops, everything stops</h2>
+        <p class="sub" style="margin-bottom:0">You do not have to watch it. NemoTorrent watches the tunnel for you, and Windows itself is told to refuse anything that tries to go around it.</p>
+        <ul class="list red">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span><b>Downloads pause instantly.</b> The status turns red and says why, in plain words.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span><b>Firewall rules hold even if the app crashes,</b> so a frozen window can never leak your address.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span><b>It reconnects on its own</b> and resumes where it left off, if you want it to.</span></li>
+        </ul>
+      </div>
+      <div class="shot"><img src="img/killswitch.webp" width="2160" height="1290" loading="lazy" alt="NemoTorrent after the VPN dropped: a red banner says VPN lost, downloads stopped, and the active downloads show Stopped, VPN lost."></div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="wrap">
+      <h2>Simple where it matters</h2>
+      <p class="sub">Pick a server from the top bar and start downloading. Everything else is there when you need it.</p>
+      <div class="gallery">
+        <figure>
+          <div class="shot"><img src="img/settings-vpn.webp" width="2160" height="1290" loading="lazy" alt="VPN settings: saved NordVPN and WireGuard profiles, with options to connect on startup and reconnect if the VPN drops."></div>
+          <figcaption>VPN profiles: NordVPN servers and your own WireGuard files, side by side.</figcaption>
+        </figure>
+        <figure>
+          <div class="shot"><img src="img/settings-speed.webp" width="2160" height="1290" loading="lazy" alt="Speed settings: the Turbo, Medium, Slow and Night profiles with their download and upload limits."></div>
+          <figcaption>Speed profiles you can switch from home, schedule, or tie to full-screen apps.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="built-with">
+    <div class="wrap">
+      <div class="kicker">Built with</div>
+      <h2>Native, small and fast</h2>
+      <p class="sub">The core is written in Rust and runs as a native Windows app. The installer is about 8 MB.</p>
+      <div class="stack">
+        <div class="chip"><b>Rust</b><span>The whole core: tunnel control, kill-switch, download orchestration and updates.</span></div>
+        <div class="chip"><b>Tauri 2</b><span>A native window on the system WebView2, without bundling a whole browser.</span></div>
+        <div class="chip"><b>React and TypeScript</b><span>The interface, kept dense and quick.</span></div>
+        <div class="chip"><b>WireGuard</b><span>The official WireGuard for Windows tunnel service, with NordLynx for NordVPN.</span></div>
+        <div class="chip"><b>Windows Filtering Platform</b><span>The firewall layer of the kill-switch, enforced by Windows itself.</span></div>
+        <div class="chip"><b>aria2</b><span>The download engine for torrents and links, shipped unmodified.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install" class="alt">
+    <div class="wrap">
+      <h2>Install in a minute</h2>
+      <p class="sub">You need Windows 10 or 11 (64-bit) and a WireGuard or NordVPN account.</p>
+      <div class="steps">
+        <div class="card"><h3>Download</h3><p>Get <code class="js-filename">NemoTorrent_x64-setup.exe</code> from the <a class="js-download" href="https://github.com/PlunderStorm/NemoTorrent-Release/releases/latest">latest release</a>. An <code>.msi</code> is there too for managed installs.</p></div>
+        <div class="card"><h3>Install</h3><p>Run the installer. On first launch NemoTorrent checks for WireGuard and offers to install the official package if it is missing.</p></div>
+        <div class="card"><h3>Connect</h3><p>Add a NordVPN server or import your WireGuard <code>.conf</code>, connect, then paste a magnet or open a <code>.torrent</code>.</p></div>
+      </div>
+      <p class="note"><b>Windows SmartScreen may warn you the first time,</b> because the installer is not yet signed with a code-signing certificate. Choose "More info", then "Run anyway", but only for an installer you downloaded from this site or its GitHub releases page.</p>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <img class="logo" src="logo.svg" alt="" width="72" height="72" style="width:72px;height:72px;margin:0 auto 20px">
+      <h2>Ready to download as no one?</h2>
+      <p class="sub">Free for personal use. Updates itself, through the tunnel.</p>
+      <div class="cta">
+        <a class="btn js-download" href="https://github.com/PlunderStorm/NemoTorrent-Release/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>
+          <span class="js-download-label">Download for Windows</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <p>© 2026 PluNdeR</p>
+      <p>NemoTorrent is free for personal, non-commercial use. See the <a href="https://github.com/PlunderStorm/NemoTorrent-Release/blob/main/LICENSE.txt">licence</a>.</p>
+    </div>
+    <div>
+      <p>Includes <a href="https://aria2.github.io/">aria2</a> 1.37.0 under the GNU GPL v2; its source is attached to every release.</p>
+      <p>Use it for content you have the right to download. Screenshots show sample data.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Point the download buttons straight at the latest installer; the release page stays as fallback.
+  (function () {
+    fetch("https://api.github.com/repos/PlunderStorm/NemoTorrent-Release/releases/latest")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (rel) {
+        if (!rel) return;
+        var exe = (rel.assets || []).find(function (a) { return /_x64-setup\.exe$/.test(a.name); });
+        var version = String(rel.tag_name || "").replace(/^v/, "");
+        if (version) document.querySelectorAll(".js-version").forEach(function (el) { el.textContent = "Version " + version; });
+        if (!exe) return;
+        var mb = Math.round(exe.size / 1e6);
+        document.querySelectorAll(".js-download").forEach(function (a) { a.href = exe.browser_download_url; });
+        document.querySelectorAll(".js-download-label").forEach(function (el) { el.textContent = "Download for Windows (" + mb + " MB)"; });
+        document.querySelectorAll(".js-filename").forEach(function (el) { el.textContent = exe.name; });
+      })
+      .catch(function () {});
+  })();
+</script>
+</body>
+</html>
