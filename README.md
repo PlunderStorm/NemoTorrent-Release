@@ -7,7 +7,7 @@
 <p align="center"><b>Download as no one.</b></p>
 
 <p align="center">
-  <a href="https://github.com/PlunderStorm/NemoTorrent-Release/releases/latest"><b>Download the latest version</b></a>
+  <a href="https://github.com/PlunderStorm/NemoTorrent-Release/releases/latest"><b>Download the latest version</b></a> · <a href="https://plunderstorm.github.io/NemoTorrent-Release/">Website</a>
 </p>
 
 NemoTorrent is a Windows app for torrents, magnet links and direct downloads that sends all of that traffic through a WireGuard VPN tunnel you choose. If the tunnel drops, downloads stop, and nothing leaves through your real IP address.
