@@ -119,6 +119,54 @@
   footer a:hover { color: var(--text); }
   footer p { margin: 0 0 6px; }
 
+
+  /* Enlargeable screenshots */
+  button.shot { display: block; width: 100%; padding: 0; font: inherit; color: inherit; cursor: zoom-in; position: relative; text-align: left; }
+  .zoom-hint { position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; background: rgba(17,20,22,.82); border: 1px solid var(--line); color: var(--text); font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; pointer-events: none; }
+  .zoom-hint svg { width: 14px; height: 14px; }
+  button.shot:hover .zoom-hint, button.shot:focus-visible .zoom-hint { opacity: 1; transform: none; }
+  button.shot img { transition: transform .4s ease; }
+  button.shot:hover img { transform: scale(1.012); }
+  @media (hover: none) { .zoom-hint { opacity: 1; transform: none; } }
+
+  .lightbox { padding: 0; border: 0; margin: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; background: rgba(8,10,11,.94); color: var(--text); }
+  .lightbox::backdrop { background: rgba(8,10,11,.94); }
+  .lightbox[open] { display: flex; flex-direction: column; animation: lb-in .2s ease; }
+  @keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+  .lb-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left)); }
+  .lb-count { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .lb-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
+  .lb-btn:hover { border-color: var(--muted); }
+  .lb-btn svg { width: 20px; height: 20px; }
+  .lb-stage { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: center; padding: 0 16px; overscroll-behavior: contain; touch-action: pan-x pan-y pinch-zoom; }
+  .lb-stage img { max-width: 100%; max-height: 100%; width: auto; height: auto; border-radius: 10px; border: 1px solid var(--line); cursor: zoom-in; user-select: none; -webkit-user-drag: none; }
+  .lightbox.zoomed .lb-stage { place-items: start; }
+  .lightbox.zoomed .lb-stage img { max-width: none; max-height: none; width: max(2160px, 100%); cursor: zoom-out; }
+  .lb-foot { display: flex; align-items: center; gap: 12px; padding: 12px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+  .lb-caption { flex: 1; min-width: 0; color: var(--muted); font-size: 14.5px; text-align: center; margin: 0; }
+  .lb-tip { display: none; }
+  @media (max-width: 640px) {
+    .lightbox.zoomed .lb-stage img { width: 1100px; }
+    .lb-tip { display: block; text-align: center; color: var(--muted); font-size: 13px; padding: 0 16px 4px; margin: 0; }
+  }
+
+  /* Scroll motion: only with JS on and when the visitor has not asked for less motion */
+  @media (prefers-reduced-motion: no-preference) {
+    .motion .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+    .motion .reveal.in { opacity: 1; transform: none; }
+    .motion .hero > .wrap > :not(.hero-shot) { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
+    .motion .hero .logo { animation-delay: 0s; }
+    .motion .hero h1 { animation-delay: .08s; }
+    .motion .hero .tag { animation-delay: .16s; }
+    .motion .hero .lead { animation-delay: .24s; }
+    .motion .hero .cta { animation-delay: .32s; }
+    .motion .hero .meta { animation-delay: .38s; }
+    @keyframes rise { from { opacity: 0; translate: 0 18px; } to { opacity: 1; translate: 0 0; } }
+    .motion .hero-wrap { perspective: 1600px; }
+    .motion .hero-shot { transform: rotateX(var(--tilt, 14deg)) scale(var(--sc, .94)); transform-origin: 50% 0; transition: transform .12s linear; will-change: transform; }
+    .motion .hero .logo { transition: transform .12s linear; transform: translateY(var(--lift, 0px)) rotate(var(--spin, 0deg)); }
+  }
+
   @media (max-width: 900px) {
     .grid, .stack, .steps { grid-template-columns: 1fr 1fr; }
     .split, .split.rev { grid-template-columns: 1fr; gap: 32px; }
@@ -153,7 +201,7 @@
 
 <main>
   <section class="hero">
-    <div class="wrap">
+    <div class="wrap hero-wrap">
       <img class="logo" src="logo.svg" alt="NemoTorrent logo: an orange porthole with a white download arrow" width="104" height="104">
       <h1>NemoTorrent</h1>
       <p class="tag">Download as no one.</p>
@@ -166,7 +214,7 @@
         <a class="btn-ghost" href="https://github.com/PlunderStorm/NemoTorrent-Release/releases">All releases</a>
       </div>
       <p class="meta"><span class="js-version">Latest version</span><span>Windows 10 and 11, 64-bit</span><span>Free for personal use</span></p>
-      <div class="shot"><img src="img/home.webp" width="2160" height="1290" alt="NemoTorrent main window: the VPN capsule at the top says Protected, with a list of Linux ISO downloads, speed profiles in the sidebar and a speed graph in the details panel."></div>
+      <button type="button" class="shot zoom hero-shot" aria-label="Enlarge screenshot" data-caption="Home: the VPN status at the top, your downloads, speed profiles and the details panel."><img src="img/home.webp" width="2160" height="1290" alt="NemoTorrent main window: the VPN capsule at the top says Protected, with a list of Linux ISO downloads, speed profiles in the sidebar and a speed graph in the details panel."><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Enlarge</span></button>
     </div>
   </section>
 
@@ -236,7 +284,7 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span><b>It reconnects on its own</b> and resumes where it left off, if you want it to.</span></li>
         </ul>
       </div>
-      <div class="shot"><img src="img/killswitch.webp" width="2160" height="1290" loading="lazy" alt="NemoTorrent after the VPN dropped: a red banner says VPN lost, downloads stopped, and the active downloads show Stopped, VPN lost."></div>
+      <button type="button" class="shot zoom" aria-label="Enlarge screenshot" data-caption="The kill-switch at work: the VPN dropped, so every download stopped."><img src="img/killswitch.webp" width="2160" height="1290" loading="lazy" alt="NemoTorrent after the VPN dropped: a red banner says VPN lost, downloads stopped, and the active downloads show Stopped, VPN lost."><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Enlarge</span></button>
     </div>
   </section>
 
@@ -246,11 +294,11 @@
       <p class="sub">Pick a server from the top bar and start downloading. Everything else is there when you need it.</p>
       <div class="gallery">
         <figure>
-          <div class="shot"><img src="img/settings-vpn.webp" width="2160" height="1290" loading="lazy" alt="VPN settings: saved NordVPN and WireGuard profiles, with options to connect on startup and reconnect if the VPN drops."></div>
+          <button type="button" class="shot zoom" aria-label="Enlarge screenshot"><img src="img/settings-vpn.webp" width="2160" height="1290" loading="lazy" alt="VPN settings: saved NordVPN and WireGuard profiles, with options to connect on startup and reconnect if the VPN drops."><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Enlarge</span></button>
           <figcaption>VPN profiles: NordVPN servers and your own WireGuard files, side by side.</figcaption>
         </figure>
         <figure>
-          <div class="shot"><img src="img/settings-speed.webp" width="2160" height="1290" loading="lazy" alt="Speed settings: the Turbo, Medium, Slow and Night profiles with their download and upload limits."></div>
+          <button type="button" class="shot zoom" aria-label="Enlarge screenshot"><img src="img/settings-speed.webp" width="2160" height="1290" loading="lazy" alt="Speed settings: the Turbo, Medium, Slow and Night profiles with their download and upload limits."><span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Enlarge</span></button>
           <figcaption>Speed profiles you can switch from home, schedule, or tie to full-screen apps.</figcaption>
         </figure>
       </div>
@@ -314,6 +362,20 @@
   </div>
 </footer>
 
+<dialog class="lightbox" id="lightbox" aria-label="Screenshot">
+  <div class="lb-bar">
+    <span class="lb-count" id="lb-count"></span>
+    <button type="button" class="lb-btn" id="lb-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="lb-stage" id="lb-stage"><img id="lb-img" alt=""></div>
+  <p class="lb-tip">Tap the image to zoom in, then drag to look around.</p>
+  <div class="lb-foot">
+    <button type="button" class="lb-btn" id="lb-prev" aria-label="Previous screenshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <p class="lb-caption" id="lb-caption"></p>
+    <button type="button" class="lb-btn" id="lb-next" aria-label="Next screenshot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+</dialog>
+
 <script>
   // Point the download buttons straight at the latest installer; the release page stays as fallback.
   (function () {
@@ -331,6 +393,92 @@
         document.querySelectorAll(".js-filename").forEach(function (el) { el.textContent = exe.name; });
       })
       .catch(function () {});
+  })();
+</script>
+<script>
+  // Screenshot lightbox: tap to open full screen, tap the image to zoom, swipe or arrows to move.
+  (function () {
+    var dlg = document.getElementById("lightbox");
+    if (!dlg || typeof dlg.showModal !== "function") return;
+    var shots = Array.prototype.slice.call(document.querySelectorAll("button.shot"));
+    var img = document.getElementById("lb-img"), cap = document.getElementById("lb-caption"), count = document.getElementById("lb-count"), stage = document.getElementById("lb-stage");
+    var idx = 0, opener = null;
+    function captionFor(btn) {
+      var fc = btn.closest("figure") && btn.closest("figure").querySelector("figcaption");
+      return fc ? fc.textContent : (btn.getAttribute("data-caption") || btn.querySelector("img").alt);
+    }
+    function show(i) {
+      idx = (i + shots.length) % shots.length;
+      var src = shots[idx].querySelector("img");
+      dlg.classList.remove("zoomed");
+      img.src = src.currentSrc || src.src;
+      img.alt = src.alt;
+      cap.textContent = captionFor(shots[idx]);
+      count.textContent = (idx + 1) + " / " + shots.length;
+    }
+    shots.forEach(function (btn, i) {
+      btn.addEventListener("click", function () { opener = btn; show(i); dlg.showModal(); document.documentElement.style.overflow = "hidden"; });
+    });
+    dlg.addEventListener("close", function () { document.documentElement.style.overflow = ""; if (opener) opener.focus(); });
+    document.getElementById("lb-close").addEventListener("click", function () { dlg.close(); });
+    document.getElementById("lb-prev").addEventListener("click", function () { show(idx - 1); });
+    document.getElementById("lb-next").addEventListener("click", function () { show(idx + 1); });
+    img.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var r = img.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+      var zoomed = dlg.classList.toggle("zoomed");
+      if (zoomed) requestAnimationFrame(function () {
+        stage.scrollLeft = fx * stage.scrollWidth - stage.clientWidth / 2;
+        stage.scrollTop = fy * stage.scrollHeight - stage.clientHeight / 2;
+      });
+    });
+    stage.addEventListener("click", function (e) { if (e.target === stage) dlg.close(); });
+    dlg.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") show(idx - 1);
+      else if (e.key === "ArrowRight") show(idx + 1);
+    });
+    var x0 = null, y0 = 0;
+    stage.addEventListener("touchstart", function (e) { x0 = e.touches.length === 1 && !dlg.classList.contains("zoomed") ? e.touches[0].clientX : null; y0 = e.touches[0].clientY; }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) show(idx + (dx < 0 ? 1 : -1));
+      x0 = null;
+    });
+  })();
+
+  // Scroll motion: sections rise in as they enter, the hero screenshot flattens as you scroll.
+  (function () {
+    if (!window.matchMedia || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+    var root = document.documentElement;
+    var groups = document.querySelectorAll("section:not(.hero) h2, section:not(.hero) .sub, section:not(.hero) .kicker, .grid > *, .stack > *, .steps > *, .gallery > *, .split > *, .list li, .note, .final .cta, .final .logo");
+    groups.forEach(function (el) {
+      el.classList.add("reveal");
+      var p = el.parentElement, sib = p ? Array.prototype.indexOf.call(p.children, el) : 0;
+      if (/grid|stack|steps|gallery|list/.test(p.className) || p.tagName === "UL") el.style.setProperty("--d", (Math.min(sib, 8) * 0.07) + "s");
+    });
+    root.classList.add("motion");
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    groups.forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight) el.classList.add("in"); else io.observe(el);
+    });
+    var shot = document.querySelector(".hero-shot"), logo = document.querySelector(".hero .logo"), ticking = false;
+    function frame() {
+      ticking = false;
+      if (!shot) return;
+      var r = shot.getBoundingClientRect(), vh = window.innerHeight;
+      var t = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.9)));
+      shot.style.setProperty("--tilt", (14 * (1 - t)).toFixed(2) + "deg");
+      shot.style.setProperty("--sc", (0.94 + 0.06 * t).toFixed(3));
+      var y = window.scrollY;
+      if (logo && y < vh) { logo.style.setProperty("--lift", (y * -0.15).toFixed(1) + "px"); logo.style.setProperty("--spin", (y * 0.06).toFixed(1) + "deg"); }
+    }
+    window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
+    window.addEventListener("resize", frame);
+    frame();
   })();
 </script>
 </body>
